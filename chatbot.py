@@ -335,6 +335,19 @@ class Chatbot:
             if question == '' or question == 'exit':
                 break
 			if question.contains("ویکی"):
+				start = txt.find( 'مورد' )
+				if (txt.find( 'بگو' )==-1):
+					if (txt.find( 'چی' )==-1):
+						if (txt.find( 'حرف' )==-1):
+							if (txt.find( 'بهم' )==-1):
+							else: end=(txt.find( 'بهم' )
+						else:end=(txt.find( 'حرف' )
+					else:end=(txt.find( 'چی' )
+				else:end=(txt.find( 'بگو' )
+				end = txt.find( 'بگو' )
+				if start != -1 and end != -1:
+					entry = txt[:start-1]+txt[end+1:]
+				else: entry="کامپیوتر"
 				obtainedTxt=(wikipedia.summary(wikipedia.search(entry)[0], sentences=1))
 				start = txt.find( '(' )
 				end = txt.find( ')' )
