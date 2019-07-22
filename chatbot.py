@@ -331,44 +331,63 @@ class Chatbot:
               'expectation. Type \'exit\' or just press ENTER to quit the program. Have fun.')
 
         while True:
-            question = translator.translate(input(), dest='en').text
-            if question == '' or question == 'exit':
-                break
-			if question.contains("ویکی"):
-				start = question.find( 'مورد' )
-				if (question.find( 'بگو' )==-1):
-					if (question.find( 'چی' )==-1):
-						if (question.find( 'حرف' )==-1):
-							if (question.find( 'بهم' )==-1):
-							else: end=(question.find( 'بهم' )
-						else:end=(question.find( 'حرف' )
-					else:end=(question.find( 'چی' )
-				else:end=(question.find( 'بگو' )
-				end = question.find( 'بگو' )
-				if start != -1 and end != -1:
-					entry = question[:start-1]+question[end+1:]
-				else: entry="کامپیوتر"
-				obtainedTxt=(wikipedia.summary(wikipedia.search(entry)[0], sentences=1))
-				start = obtainedTxt.find( '(' )
-				end = obtainedTxt.find( ')' )
-				if start != -1 and end != -1:
-					wikiExtractedResult = obtainedTxt[:start-1]+txt[end+1:]
-				answer=wikiExtractedResult
-			else:
-            questionSeq = []  # Will be contain the question as seen by the encoder
-            answer = self.singlePredict(question, questionSeq)
-            if not answer:
-                print('Warning: sentence too long, sorry. Maybe try a simpler sentence.')
-                continue  # Back to the beginning, try again
+            question=input()
+            if ('ویکی' in question):
+                #print("wiki found")
+                start = question.find( 'مورد' )
+                if (question.find( 'چی' )==-1):
+                    if (question.find( 'بهم' )==-1):
+                        if (question.find( 'حرف' )==-1):
+                            if (question.find( 'بگو' )!=-1):
+                                end=question.find('بگو')
+                                print("بگو"+"found")
+                        else:
+                            end=question.find( 'حرف' )
+                            print("حرف"+"found")
+                    else:
+                        end=question.find( 'بهم' )
+                        print("بهم"+"found")
+                else:
+                    end=question.find( 'چی' )
+                    print("چی"+"found")
+                print("Start:")
+                print(start)
+                print("end:")
+                print(end)
+                if start != -1 and end != -1:
+                    entry = question[start+5:end-1]
+                    print(entry)
+                else:
+                    entry="کامپیوتر"
+                obtainedTxt=(wikipedia.summary(wikipedia.search(entry)[0], sentences=1))
+                print(obtainedTxt)
+                start = obtainedTxt.find( '(' )
+                end = obtainedTxt.find( ')' )
+                if start != -1 and end != -1:
+                    wikiExtractedResult = obtainedTxt[:start-1]+obtainedTxt[end+1:]
+                else:
+                    wikiExtractedResult=obtainedTxt
+                answer=wikiExtractedResult
+            else:
+                question = translator.translate(question, dest='en').text
+                if question == '' or question == 'exit':
+                    break               
+                #print("wiki NOT found")
+                questionSeq = []  # Will be contain the question as seen by the encoder
+                answer = self.singlePredict(question, questionSeq)
+                if not answer:
+                    print('Warning: sentence too long, sorry. Maybe try a simpler sentence.')
+                    continue  # Back to the beginning, try again
+                answer=translator.translate(self.textData.sequence2str(answer, clean=True), dest='fa').text
 
-            print('{}{}'.format(self.SENTENCES_PREFIX[1], translator.translate(self.textData.sequence2str(answer, clean=True), dest='fa').text))
-
+            print('{}{}'.format(self.SENTENCES_PREFIX[1],answer))
+                
             if self.args.verbose:
                 print(self.textData.batchSeq2str(questionSeq, clean=True, reverse=True))
                 print(self.textData.sequence2str(answer))
-
+                
             print()
-
+    
     def singlePredict(self, question, questionSeq=None):
         """ Predict the sentence
         Args:
